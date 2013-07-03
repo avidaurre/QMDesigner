@@ -1,12 +1,14 @@
 ﻿Imports BO
 Public Class FrmPropertyInformation
 
-    Public Shared Function Execute(ByVal emptyObject As BO.GenericObject) As BO.GenericObject
+    Public Shared lobjEmpty As New BO.Information
 
+    Public Shared Function Execute(ByVal emptyObject As BO.Information) As BO.GenericObject
+
+        lobjEmpty = emptyObject
         ' Execute the Editor and return the generic object'
         Dim form As New FrmPropertyInformation(emptyObject)
         If form.ShowDialog = Windows.Forms.DialogResult.OK Then
-            form.PopulateQuestions(emptyObject)
             Return emptyObject
         Else
             Return Nothing
@@ -31,7 +33,7 @@ Public Class FrmPropertyInformation
         Me.LblUniqueID.Text = emptyObject.Guid.ToString()
     End Sub
 
-    Public Function PopulateQuestions(ByVal ObjectToPopulate As BO.Information) As Boolean
+    Public Function PopulateInformation(ByVal ObjectToPopulate As BO.Information) As BO.Information
 
         ' Update Main Data
         ObjectToPopulate.Name = Me.TxtName.Text
@@ -44,6 +46,8 @@ Public Class FrmPropertyInformation
         ObjectToPopulate.HideBack = Me.CmbHideBack.Text
         ObjectToPopulate.HideNext = Me.CmbHideNext.Text
         ObjectToPopulate.Visible = Me.CmbVisible.Text
+
+        Return ObjectToPopulate
     End Function
 
     Private Sub BtnName_Click(sender As System.Object, e As System.EventArgs) Handles BtnName.Click
@@ -64,5 +68,18 @@ Public Class FrmPropertyInformation
 
     Private Sub BtnOnUnload_Click(sender As System.Object, e As System.EventArgs) Handles BtnOnUnload.Click
         TxtOnUnload.Text = CodeEditorForm.GetString(TxtOnUnload.Text)
+    End Sub
+
+    Private Sub FrmPropertyInformation_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles Me.Validating
+        
+        If Me.DialogResult = Windows.Forms.DialogResult.OK Then
+
+            If lobjEmpty.GetType().GetInterface("ISelfValidate") IsNot Nothing Then
+
+                e.Cancel = Not CType(PopulateInformation(lobjEmpty), BO.ISelfValidate).IsValid()
+
+            End If
+
+        End If
     End Sub
 End Class

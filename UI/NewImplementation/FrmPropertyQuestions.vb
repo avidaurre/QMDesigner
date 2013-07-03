@@ -112,7 +112,7 @@ Public Class FrmPropertyQuestions
 
     Private Sub FrmPropertyQuestions_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
 
-
+        CmbScreenTem.Items.Clear()
         For i As Integer = 0 To Logic.GetStandardValues().Count - 1 Step 1
             CmbScreenTem.Items.Add(Logic.GetStandardValues().Item(i))
         Next
@@ -137,6 +137,7 @@ Public Class FrmPropertyQuestions
             Next
 
         Else
+            CmbLegalValue.Text = String.Empty
             CmbLegalValue.Items.Clear()
         End If
 

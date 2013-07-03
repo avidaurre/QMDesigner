@@ -1,8 +1,12 @@
 ﻿Imports BO
 Public Class CtlInformation
-    Public Sub PopulateInformation(ByVal Tag As BO.Information)
+
+    Private lObjEmpty As BO.Information = Nothing
+
+    Public Function PopulateInformation(ByVal Tag As BO.Information) As BO.Information
         'Valid if the data are empty or Null
 
+        lobjEmpty = Tag
         If (Tag.Name = Nothing) Then
             Me.TxtName.Text = String.Empty
         Else
@@ -62,7 +66,27 @@ Public Class CtlInformation
         Me.CmbHideNext.Text = Tag.HideNext.ToString()
         Me.CmbVisible.Text = Tag.Visible.ToString()
 
-    End Sub
+        Return Tag
+
+    End Function
+
+     Public Function UpdateInformation(ByVal ObjectToPopulate As BO.Information) As BO.Information
+
+        ' Update Main Data
+        ObjectToPopulate.Name = Me.TxtName.Text
+        ObjectToPopulate.MainText = Me.TxtMainText.Text
+        ObjectToPopulate.Comment = Me.TxtComment.Text
+        'Update PDA_Action Data
+        ObjectToPopulate.OnLoad = Me.TxtOnLoad.Text
+        ObjectToPopulate.OnUnload = Me.TxtOnUnload.Text
+        'Update PDA_Settings
+        ObjectToPopulate.HideBack = Me.CmbHideBack.Text
+        ObjectToPopulate.HideNext = Me.CmbHideNext.Text
+        ObjectToPopulate.Visible = Me.CmbVisible.Text
+
+        Return ObjectToPopulate
+
+    End Function
 
     Private Sub BtnName_Click(sender As System.Object, e As System.EventArgs) Handles BtnName.Click
         TxtName.Text = CodeEditorForm.GetString(TxtName.Text)
@@ -82,5 +106,16 @@ Public Class CtlInformation
 
     Private Sub BtnOnUnload_Click(sender As System.Object, e As System.EventArgs) Handles BtnOnUnload.Click
         TxtOnUnload.Text = CodeEditorForm.GetString(TxtOnUnload.Text)
+    End Sub
+
+    Private Sub CtlInformation_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles Me.Validating
+        
+        
+        If lobjEmpty.GetType().GetInterface("ISelfValidate") IsNot Nothing Then
+            e.Cancel = Not CType(UpdateInformation(lobjEmpty), BO.ISelfValidate).IsValid()
+        else
+            UpdateInformation(lobjEmpty)
+        End If
+    
     End Sub
 End Class

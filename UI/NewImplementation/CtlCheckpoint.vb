@@ -1,11 +1,11 @@
 ﻿Imports BO
 Public Class CtlCheckpoint
 
-    Private Sub GrbMain_Enter(sender As System.Object, e As System.EventArgs) Handles GrbMain.Enter
+    Private lObjEmpty As BO.CheckPoint = Nothing
 
-    End Sub
-
-    Public Sub PopulateCheckPoint(ByVal Tag As BO.CheckPoint)
+    Public Function PopulateCheckPoint(ByVal Tag As BO.CheckPoint) As BO.CheckPoint
+        
+        lObjEmpty = Tag
 
         If (Tag.Name = Nothing) Then
             Me.TxtName.Text = String.Empty
@@ -57,7 +57,20 @@ Public Class CtlCheckpoint
             Me.LblUniqueId.Text = Tag.Guid.ToString()
         End If
 
-    End Sub
+        Return Tag
+    End Function
+
+    Public Function UpdateCheckpoint(ByVal ObjectToPopulate As BO.CheckPoint) As BO.CheckPoint
+
+        ObjectToPopulate.Name = Me.TxtName.Text
+        ObjectToPopulate.MainText = Me.TxtMainText.Text
+        ObjectToPopulate.BranchIf = Me.CmbBranch.Text
+        ObjectToPopulate.Condition = Me.TxtCondition.Text
+        ObjectToPopulate.Comment = Me.TxtComment.Text
+
+        Return ObjectToPopulate
+
+    End Function
 
     Private Sub BtnName_Click(sender As System.Object, e As System.EventArgs) Handles BtnName.Click
         TxtName.Text = CodeEditorForm.GetString(TxtName.Text)
@@ -73,5 +86,12 @@ Public Class CtlCheckpoint
 
     Private Sub BtnCondition_Click(sender As System.Object, e As System.EventArgs) Handles BtnCondition.Click
         TxtCondition.Text = CodeEditorForm.GetString(TxtCondition.Text)
+    End Sub
+
+    Private Sub CtlCheckpoint_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles Me.Validating
+         
+        If lobjEmpty.GetType().GetInterface("ISelfValidate") IsNot Nothing Then
+            e.Cancel = Not CType(UpdateCheckpoint(lobjEmpty), BO.ISelfValidate).IsValid()
+        End If
     End Sub
 End Class
