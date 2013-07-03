@@ -25,8 +25,9 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <UpgradeBackupLocation />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -144,6 +145,30 @@
     <Compile Include="Editor Classes\Editors\ScreenTemplateEditor.vb" />
     <Compile Include="Editor Classes\Editors\CodeEditor.vb" />
     <Compile Include="Editor Classes\Editors\VariableScopeEditor.vb" />
+    <Compile Include="Editor Classes\UserControls\CtlFiles.Designer.vb">
+      <DependentUpon>CtlFiles.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Editor Classes\UserControls\CtlFiles.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editor Classes\UserControls\CtlMethod.Designer.vb">
+      <DependentUpon>CtlMethod.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Editor Classes\UserControls\CtlMethod.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editor Classes\UserControls\CtlPdaReports.Designer.vb">
+      <DependentUpon>CtlPdaReports.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Editor Classes\UserControls\CtlPdaReports.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editor Classes\UserControls\CtlPDAUsers.Designer.vb">
+      <DependentUpon>CtlPDAUsers.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Editor Classes\UserControls\CtlPDAUsers.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="ISelfValidate.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -184,6 +209,18 @@
     <EmbeddedResource Include="Editor Classes\Forms\CodeEditorForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>CodeEditorForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor Classes\UserControls\CtlFiles.resx">
+      <DependentUpon>CtlFiles.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor Classes\UserControls\CtlMethod.resx">
+      <DependentUpon>CtlMethod.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor Classes\UserControls\CtlPdaReports.resx">
+      <DependentUpon>CtlPdaReports.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor Classes\UserControls\CtlPDAUsers.resx">
+      <DependentUpon>CtlPDAUsers.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -229,6 +266,10 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{94E38DFF-614B-4CBD-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
