@@ -1,8 +1,13 @@
 ﻿Imports BO
 Public Class CtlQuestions
 
-    Public Sub PopulateQuestion(ByVal Tag As BO.Question)
+    Private lobjEmpty As BO.Question = Nothing
+
+    Public Function PopulateQuestion(ByVal Tag As BO.Question) As BO.Question
         'Valid if the data are empty or Null
+        
+        lobjEmpty = Tag
+        Me.GetDataDypes()
 
         If (Tag.Name = Nothing) Then
             Me.TxtName.Text = String.Empty
@@ -130,7 +135,12 @@ Public Class CtlQuestions
             Me.LblUniqueID.Text = Tag.Guid.ToString()
         End If
 
-        Me.CmbLegalValue.Text = Tag.LegalValueTable.ToString()
+        If (Tag.LegalValueTable Is Nothing) Then
+            Me.CmbLegalValue.Text = String.Empty
+        Else
+            Me.CmbLegalValue.Text = Tag.LegalValueTable.ToString()
+        End If
+
         Me.CmbScreenTem.Text = Tag.ScreenTemplate.ToString()
         Me.CmbVarScope.Text = Tag.VariableScope.ToString()
         Me.CmbGroupMem.Text = Tag.GroupMember.ToString()
@@ -141,6 +151,91 @@ Public Class CtlQuestions
         Me.CmbConfNext.Text = Tag.ConfirmNext.ToString()
         Me.CmbHideBack.Text = Tag.HideBack.ToString()
         Me.CmbHideNext.Text = Tag.HideNext.ToString()
+
+        Return Tag
+    End Function
+
+     Public Function UpdateQuestions(ByVal ObjectToPopulate As BO.Question) As BO.Question
+        Dim ItemScope As Integer = -1
+        Select Case CmbVarScope.Text
+            Case "QuestionnaireSet"
+                ItemScope = 2
+            Case "Questionnaire"
+                ItemScope = 3
+            Case "Section"
+                ItemScope = 4
+        End Select
+
+        ' Update Main Data
+        ObjectToPopulate.Name = Me.TxtName.Text
+        ObjectToPopulate.MainText = Me.TxtMainText.Text
+        ObjectToPopulate.Comment = Me.TxtComment.Text
+        'Update Data_Entry Data
+        ObjectToPopulate.LegalValueTable = Me.CmbLegalValue.Text
+        ObjectToPopulate.ScreenTemplate = Me.CmbScreenTem.Text
+        ObjectToPopulate.VariableName = Me.TxtVarName.Text
+        ObjectToPopulate.VariableScope = ItemScope
+        'Update Data_Variables_Ranges Data
+        ObjectToPopulate.AbsoluteMaximum = Me.TxtAbsMax.Text
+        ObjectToPopulate.AbsoluteMinimum = Me.TxtAbsMin.Text
+        ObjectToPopulate.PromptOver = Me.TxtPromptOver.Text
+        ObjectToPopulate.PromptUnder = Me.TxtPromptUnder.Text
+        'Update Misc Data
+        ObjectToPopulate.GroupMember = Me.CmbGroupMem.Text
+        ObjectToPopulate.GroupText = Me.TxtGroupText.Text
+        ObjectToPopulate.Visible = Me.CmbShowQuestion.Text
+        'Update PDA_Action Data
+        ObjectToPopulate.CustomValidationFailMessage = Me.TxtCustomMss.Text
+        ObjectToPopulate.CustomValidation = Me.TxtCustomValidation.Text
+        ObjectToPopulate.OnChange = Me.TxtOnChange.Text
+        ObjectToPopulate.OnLoad = Me.TxtOnLoad.Text
+        ObjectToPopulate.OnUnload = Me.TxtOnUnload.Text
+        'Update PDA_Settings
+        ObjectToPopulate.Required = Me.CmbAnswerReq.Text
+        ObjectToPopulate.ConfirmBack = Me.CmbConfBack.Text
+        ObjectToPopulate.ConfirmChange = Me.CmbConfChange.Text
+        ObjectToPopulate.ConfirmNext = Me.CmbConfNext.Text
+        ObjectToPopulate.HelpText = Me.TxtHelpText.Text
+        ObjectToPopulate.HideBack = Me.CmbHideBack.Text
+        ObjectToPopulate.HideNext = Me.CmbHideNext.Text
+        ObjectToPopulate.Arguments = Me.TxtArguments.Text
+
+        Return ObjectToPopulate
+    End Function
+
+    Private Sub GetDataDypes()
+
+        CmbScreenTem.Items.Clear()
+        For i As Integer = 0 To Logic.GetStandardValues().Count - 1 Step 1
+            CmbScreenTem.Items.Add(Logic.GetStandardValues().Item(i))
+        Next
+
+        Dim Valores As Array
+        Valores = System.Enum.GetNames(GetType(BO.VariableScopes))
+        CmbVarScope.Items.Clear()
+        For Each Item As String In Valores
+            CmbVarScope.Items.Add(Item)
+        Next
+
+    End Sub
+
+        Private Sub CmbScreenTem_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles CmbScreenTem.SelectedIndexChanged
+        If CmbScreenTem.Text = "DropDown" Or CmbScreenTem.Text = "RadioButtons" Or CmbScreenTem.Text = "CheckBox" Or CmbScreenTem.Text = "Name" Then
+
+
+            CmbLegalValue.Items.Clear()
+            Dim LegalValueTable As System.ComponentModel.TypeConverter.StandardValuesCollection
+            LegalValueTable = Logic.GetStandardValuesLegalValueTable(CmbScreenTem.Text)
+            For i As Integer = 0 To LegalValueTable.Count - 1 Step 1
+                CmbLegalValue.Items.Add(LegalValueTable.Item(i))
+            Next
+
+        Else
+            CmbLegalvalue.Text = String.Empty
+            CmbLegalValue.Items.Clear()
+        End If
+
+        TxtDataType.Text = Logic.DataTypeNames(CmbScreenTem.Text)
 
     End Sub
 
@@ -191,5 +286,13 @@ Public Class CtlQuestions
 
     Private Sub BtnHelpText_Click(sender As System.Object, e As System.EventArgs) Handles BtnHelpText.Click
         TxtHelpText.Text = CodeEditorForm.GetString(TxtHelpText.Text)
+    End Sub
+
+    Private Sub CtlQuestions_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles Me.Validating
+        If lobjEmpty.GetType().GetInterface("ISelfValidate") IsNot Nothing Then
+
+            e.Cancel = Not CType(UpdateQuestions(lobjEmpty), BO.ISelfValidate).IsValid()
+
+        End If
     End Sub
 End Class

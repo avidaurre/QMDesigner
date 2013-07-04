@@ -2,15 +2,17 @@
 
 Public Class FrmPropertyCheckpoint
 
+    Public Shared lobjEmpty As New BO.CheckPoint
+
     Private _propertyCheckpoint As Object
 
 
     Public Shared Function Execute(ByVal emptyObject As BO.CheckPoint) As BO.GenericObject
+        lobjEmpty = emptyObject
 
         ' Execute the Editor and return the generic object'
         Dim form As New FrmPropertyCheckpoint(emptyObject)
         If form.ShowDialog = Windows.Forms.DialogResult.OK Then
-            form.PopulateCheckPoint(emptyObject)
             Return emptyObject
         Else
             Return Nothing
@@ -31,7 +33,7 @@ Public Class FrmPropertyCheckpoint
 
     End Sub
 
-    Public Function PopulateCheckPoint(ByVal ObjectToPopulate As BO.CheckPoint) As Boolean
+    Public Function PopulateCheckPoint(ByVal ObjectToPopulate As BO.CheckPoint) As BO.CheckPoint
 
         ObjectToPopulate.Name = Me.TxtName.Text
         ObjectToPopulate.MainText = Me.TxtMainText.Text
@@ -39,23 +41,20 @@ Public Class FrmPropertyCheckpoint
         ObjectToPopulate.Condition = Me.TxtCondition.Text
         ObjectToPopulate.Comment = Me.TxtComment.Text
 
+        Return ObjectToPopulate
     End Function
 
 
     Private Sub PropertyCheckpoint_FormClosing(sender As System.Object, e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
 
-        Dim msgValue As String = String.Empty
+       If Me.DialogResult = Windows.Forms.DialogResult.OK Then
 
-        If Me.DialogResult = Windows.Forms.DialogResult.OK Then
+            If lobjEmpty.GetType().GetInterface("ISelfValidate") IsNot Nothing Then
 
-            If String.IsNullOrEmpty(Me.TxtMainText.Text) Then msgValue &= Environment.NewLine & "Main text is required."
-            If String.IsNullOrEmpty(Me.TxtCondition.Text) Then msgValue &= Environment.NewLine & "Condition is required."
-            If String.IsNullOrEmpty(Me.CmbBranch.Text) Then msgValue &= Environment.NewLine & "BranchIf is required."
+                e.Cancel = Not CType(PopulateCheckPoint(lobjEmpty), BO.ISelfValidate).IsValid()
 
-            If Not String.IsNullOrEmpty(msgValue) Then
-                MessageBox.Show("Error list:" & msgValue, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                e.Cancel = True
             End If
+
         End If
 
     End Sub
